@@ -9,6 +9,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -24,10 +25,11 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Clothing Marketplace API' });
+  res.json({ message: 'NgeBaju-API' });
 });
 
 // Error handling middleware
