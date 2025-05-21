@@ -1,0 +1,817 @@
+{
+    "info": {
+      "_postman_id": "f8e7d6c5-b4a3-2c1d-0e9f-8a7b6c5d4e3f",
+      "name": "Clothing Marketplace API",
+      "description": "API untuk marketplace pakaian dengan autentikasi JWT dan fitur CRUD untuk produk, kategori, pengguna, dan pesanan.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:8000",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Auth",
+        "description": "Endpoint autentikasi untuk registrasi, login, dan profil pengguna",
+        "item": [
+          {
+            "name": "Register",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"address\": \"Jl. Contoh No. 123, Malang\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/register",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "register"
+                ]
+              },
+              "description": "Mendaftarkan pengguna baru"
+            },
+            "response": []
+          },
+          {
+            "name": "Login",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var jsonData = pm.response.json();",
+                    "if (jsonData && jsonData.token) {",
+                    "    pm.environment.set(\"token\", jsonData.token);",
+                    "    console.log(\"Token disimpan ke environment\");",
+                    "}"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"password123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/login",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "login"
+                ]
+              },
+              "description": "Login pengguna dan mendapatkan token JWT"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Profile",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/profile",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "profile"
+                ]
+              },
+              "description": "Mendapatkan profil pengguna yang sedang login"
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Products",
+        "description": "Endpoint untuk manajemen produk",
+        "item": [
+          {
+            "name": "Get All Products",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/api/products?page=1&limit=10&category=&search=",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "products"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1",
+                    "description": "Halaman yang ingin ditampilkan"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10",
+                    "description": "Jumlah item per halaman"
+                  },
+                  {
+                    "key": "category",
+                    "value": "",
+                    "description": "Filter berdasarkan ID kategori"
+                  },
+                  {
+                    "key": "search",
+                    "value": "",
+                    "description": "Pencarian berdasarkan nama dan deskripsi"
+                  }
+                ]
+              },
+              "description": "Mendapatkan daftar produk dengan paginasi dan filter"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Product by ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/api/products/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "products",
+                  "1"
+                ]
+              },
+              "description": "Mendapatkan detail produk berdasarkan ID"
+            },
+            "response": []
+          },
+          {
+            "name": "Create Product (Admin)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Kemeja Formal Pria\",\n  \"description\": \"Kemeja formal pria dengan bahan katun premium, nyaman digunakan untuk kegiatan formal maupun semi-formal\",\n  \"price\": 249000,\n  \"stock\": 75,\n  \"category_id\": 1,\n  \"sizes\": [\n    { \"size\": \"S\", \"stock\": 15 },\n    { \"size\": \"M\", \"stock\": 25 },\n    { \"size\": \"L\", \"stock\": 20 },\n    { \"size\": \"XL\", \"stock\": 15 }\n  ],\n  \"images\": [\n    \"https://example.com/kemeja-formal-1.jpg\",\n    \"https://example.com/kemeja-formal-2.jpg\"\n  ]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/products",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "products"
+                ]
+              },
+              "description": "Membuat produk baru (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Update Product (Admin)",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Kemeja Formal Pria Premium\",\n  \"description\": \"Kemeja formal pria dengan bahan katun premium impor, nyaman digunakan untuk kegiatan formal maupun semi-formal\",\n  \"price\": 299000,\n  \"stock\": 60,\n  \"category_id\": 1,\n  \"sizes\": [\n    { \"size\": \"S\", \"stock\": 10 },\n    { \"size\": \"M\", \"stock\": 20 },\n    { \"size\": \"L\", \"stock\": 20 },\n    { \"size\": \"XL\", \"stock\": 10 }\n  ],\n  \"images\": [\n    \"https://example.com/kemeja-formal-premium-1.jpg\",\n    \"https://example.com/kemeja-formal-premium-2.jpg\",\n    \"https://example.com/kemeja-formal-premium-3.jpg\"\n  ]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/products/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "products",
+                  "1"
+                ]
+              },
+              "description": "Memperbarui produk berdasarkan ID (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Delete Product (Admin)",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/products/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "products",
+                  "1"
+                ]
+              },
+              "description": "Menghapus produk berdasarkan ID (hanya admin)"
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Categories",
+        "description": "Endpoint untuk manajemen kategori",
+        "item": [
+          {
+            "name": "Get All Categories",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/api/categories",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories"
+                ]
+              },
+              "description": "Mendapatkan daftar semua kategori"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Category by ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/api/categories/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories",
+                  "1"
+                ]
+              },
+              "description": "Mendapatkan detail kategori berdasarkan ID"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Products by Category",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/api/categories/1/products?page=1&limit=10",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories",
+                  "1",
+                  "products"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Mendapatkan daftar produk berdasarkan kategori"
+            },
+            "response": []
+          },
+          {
+            "name": "Create Category (Admin)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Pakaian Formal\",\n  \"description\": \"Kategori untuk pakaian formal pria dan wanita\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/categories",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories"
+                ]
+              },
+              "description": "Membuat kategori baru (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Update Category (Admin)",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Pakaian Formal Premium\",\n  \"description\": \"Kategori untuk pakaian formal premium pria dan wanita dengan kualitas terbaik\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/categories/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories",
+                  "1"
+                ]
+              },
+              "description": "Memperbarui kategori berdasarkan ID (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Delete Category (Admin)",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/categories/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "categories",
+                  "1"
+                ]
+              },
+              "description": "Menghapus kategori berdasarkan ID (hanya admin)"
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Users",
+        "description": "Endpoint untuk manajemen pengguna",
+        "item": [
+          {
+            "name": "Get All Users (Admin)",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/users?page=1&limit=10&role=",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "users"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "role",
+                    "value": "",
+                    "description": "Filter berdasarkan role (admin/customer)"
+                  }
+                ]
+              },
+              "description": "Mendapatkan daftar semua pengguna (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Get User by ID",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/users/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "users",
+                  "1"
+                ]
+              },
+              "description": "Mendapatkan detail pengguna berdasarkan ID (admin atau pengguna itu sendiri)"
+            },
+            "response": []
+          },
+          {
+            "name": "Update User Profile",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"username\": \"john_doe_updated\",\n  \"phone\": \"08987654321\",\n  \"address\": \"Jl. Contoh Baru No. 456, Malang\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/users/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "users",
+                  "1"
+                ]
+              },
+              "description": "Memperbarui profil pengguna (admin atau pengguna itu sendiri)"
+            },
+            "response": []
+          },
+          {
+            "name": "Change Password",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"current_password\": \"password123\",\n  \"new_password\": \"newpassword123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/users/1/password",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "users",
+                  "1",
+                  "password"
+                ]
+              },
+              "description": "Mengubah password pengguna (admin atau pengguna itu sendiri)"
+            },
+            "response": []
+          },
+          {
+            "name": "Update User Role (Admin)",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"role\": \"admin\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/users/2/role",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "users",
+                  "2",
+                  "role"
+                ]
+              },
+              "description": "Mengubah role pengguna (hanya admin)"
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Orders",
+        "description": "Endpoint untuk manajemen pesanan",
+        "item": [
+          {
+            "name": "Get All Orders (Admin)",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/orders?page=1&limit=10&status=",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "status",
+                    "value": "",
+                    "description": "Filter berdasarkan status"
+                  }
+                ]
+              },
+              "description": "Mendapatkan daftar semua pesanan (hanya admin)"
+            },
+            "response": []
+          },
+          {
+            "name": "Get User Orders",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/orders/me?page=1&limit=10&status=",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders",
+                  "me"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "status",
+                    "value": "",
+                    "description": "Filter berdasarkan status"
+                  }
+                ]
+              },
+              "description": "Mendapatkan daftar pesanan pengguna yang sedang login"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Order by ID",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/orders/1",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders",
+                  "1"
+                ]
+              },
+              "description": "Mendapatkan detail pesanan berdasarkan ID (admin atau pemilik pesanan)"
+            },
+            "response": []
+          },
+          {
+            "name": "Create Order",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"size\": \"M\",\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 2,\n      \"size\": \"L\",\n      \"quantity\": 1\n    }\n  ]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/orders",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders"
+                ]
+              },
+              "description": "Membuat pesanan baru"
+            },
+            "response": []
+          },
+          {
+            "name": "Update Order Status (Admin)",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"status\": \"processing\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/orders/1/status",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders",
+                  "1",
+                  "status"
+                ]
+              },
+              "description": "Memperbarui status pesanan (hanya admin). Status yang valid: pending, processing, shipped, delivered, completed, cancelled, returned, refunded"
+            },
+            "response": []
+          },
+          {
+            "name": "Cancel Order",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/orders/1/cancel",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "orders",
+                  "1",
+                  "cancel"
+                ]
+              },
+              "description": "Membatalkan pesanan (admin atau pemilik pesanan). Hanya pesanan dengan status 'pending' atau 'processing' yang dapat dibatalkan."
+            },
+            "response": []
+          }
+        ]
+      }
+    ]
+  }
