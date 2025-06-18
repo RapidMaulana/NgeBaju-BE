@@ -14,8 +14,8 @@
    npm install
    ```
 
-3. **Download dan Masukkan File `.env`**
-   Unduh file `.env` yang telah disediakan, lalu masukkan file tersebut ke direktori root proyek.
+3. **Setup file environment `.env`**
+   buat file bernama ".env" pada root project backend, kemudian masukkan template file .env yang sudah disediakan.
 
 4. **Menjalankan Proyek**
    Untuk menjalankan proyek, gunakan perintah berikut:
